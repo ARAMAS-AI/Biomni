@@ -1,7 +1,3 @@
-Here's that sequence of commands formatted as a README file:
-
------
-
 # Biomni Project Setup
 
 This guide outlines the steps to set up and run the Biomni server and web UI.
