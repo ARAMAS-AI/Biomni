@@ -6,8 +6,10 @@ allowing configuration of LLM parameters and streaming of agent execution steps.
 """
 
 import os
+import re
+import json
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Optional, Dict
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -33,6 +35,7 @@ async def lifespan(app: FastAPI):
     print("Initializing Biomni agent...")
     # Initialize with default config on startup
     default_config.path = '/Users/balaji/Biomni/data'
+    default_config.llm = 'gpt-4.1'
     agent = A1(path="/Users/balaji/Biomni/data")
     print("Biomni agent initialized successfully")
     yield
@@ -84,6 +87,41 @@ class HealthResponse(BaseModel):
     message: str
 
 
+def parse_ai_message(content: str) -> Dict[str, str]:
+    """
+    Parses the content of an AI message to extract thought, observation, and code.
+
+    Args:
+        content: The raw string content from an AI message.
+
+    Returns:
+        A dictionary with 'thought', 'observation', and 'code' keys.
+    """
+    parsed_data = {
+        "thought": "",
+        "observation": "",
+        "code": ""
+    }
+    
+    # Use re.DOTALL to make '.' match newlines
+    # Extract observation
+    observation_match = re.search(r"<observation>(.*?)</observation>", content, re.DOTALL)
+    if observation_match:
+        parsed_data["observation"] = observation_match.group(1).strip()
+        content = content.replace(observation_match.group(0), "") # Remove the tag to isolate thought
+
+    # Extract execute/code
+    execute_match = re.search(r"<execute>(.*?)</execute>", content, re.DOTALL)
+    if execute_match:
+        parsed_data["code"] = execute_match.group(1).strip()
+        content = content.replace(execute_match.group(0), "") # Remove the tag to isolate thought
+    
+    # The rest is thought
+    parsed_data["thought"] = content.strip()
+    
+    return parsed_data
+
+
 @app.get("/", response_model=HealthResponse)
 async def root():
     """Root endpoint with API information."""
@@ -104,35 +142,47 @@ async def health_check():
 
 async def step_generator(query: str, config: dict):
     """
-    Generator function that yields steps from the agent execution.
+    Generator function that yields parsed steps from the agent execution.
+    It ignores human messages and structures AI messages into a JSON object.
 
     Args:
-        query: The biomedical query to process
-        config: Configuration dictionary for the agent
+        query: The biomedical query to process.
+        config: Configuration dictionary for the agent.
     """
     try:
         # Create a new agent instance with the provided configuration
-        # Filter out None values from config
         agent_config = {k: v for k, v in config.items() if v is not None}
-
-        # Create agent with custom configuration
         custom_agent = A1(**agent_config)
+
+        # Define message headers to look for
+        human_header = "================================ Human Message ================================="
+        ai_header = "================================== Ai Message =================================="
 
         # Stream the agent execution
         for step in custom_agent.go_stream(query):
-            # Yield each step as a formatted string for SSE
-            # Format: data: {json}\n\n
-            import json
+            raw_output = step.get("output", "")
 
-            yield f"data: {json.dumps(step)}\n\n"
+            # 1. Ignore Human Messages
+            if human_header in raw_output:
+                continue
+
+            # 2. Parse AI Messages
+            elif ai_header in raw_output:
+                # Extract content after the header
+                content = raw_output.split(ai_header, 1)[1]
+                parsed_json = parse_ai_message(content)
+                
+                # Only yield if there's content to send
+                if any(parsed_json.values()):
+                    yield f"data: {json.dumps(parsed_json)}\n\n"
+            
+            # Note: Other message types or raw output without headers will be ignored.
 
         # Send a final message to indicate completion
         yield f"data: {json.dumps({'output': '[DONE]', 'status': 'completed'})}\n\n"
 
     except Exception as e:
         # Send error as the final message
-        import json
-
         error_msg = {"output": f"Error: {str(e)}", "status": "error"}
         yield f"data: {json.dumps(error_msg)}\n\n"
 
@@ -140,11 +190,12 @@ async def step_generator(query: str, config: dict):
 @app.post("/agent/stream")
 async def run_agent_stream(request: AgentRequest):
     """
-    Execute the Biomni agent with streaming response.
+    Execute the Biomni agent with a structured, streaming JSON response.
 
     This endpoint streams the agent's execution steps in real-time using Server-Sent Events (SSE).
-    Each step is sent as a JSON object with the format: {"output": "step content"}
-
+    - "Human Message" steps from the agent are ignored.
+    - "AI Message" steps are parsed into a JSON object with keys: `thought`, `observation`, and `code`.
+    
     The stream ends with a message: {"output": "[DONE]", "status": "completed"}
 
     Example:
