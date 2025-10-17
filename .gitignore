@@ -29,6 +29,8 @@ examples/*.csv
 examples/*.fa
 scratch/
 packages/
+save_folder/*
+save_folder/
 data
 dataset
 logs
