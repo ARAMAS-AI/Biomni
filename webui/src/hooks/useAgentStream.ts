@@ -4,6 +4,7 @@ export interface StreamMessage {
   thought?: string;
   observation?: string;
   code?: string;
+  solution?: string;
 }
 
 export interface UseAgentStreamResult {
@@ -97,10 +98,11 @@ export function useAgentStream(
                   thought: parsed.thought || undefined,
                   observation: parsed.observation || undefined,
                   code: parsed.code || undefined,
+                  solution: parsed.solution || undefined,
                 };
 
                 // Only process if there's actual content
-                if (message.thought || message.observation || message.code) {
+                if (message.thought || message.observation || message.code || message.solution) {
                   setCurrentMessage(message);
                   onMessage(message);
                 }

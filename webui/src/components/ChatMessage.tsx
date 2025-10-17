@@ -8,6 +8,7 @@ export interface Message {
   thought?: string;
   observation?: string;
   code?: string;
+  solution?: string;
   timestamp: Date;
 }
 
@@ -41,6 +42,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               thought={message.thought}
               observation={message.observation}
               code={message.code}
+              solution={message.solution}
             />
           )}
         </CardContent>

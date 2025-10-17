@@ -89,20 +89,21 @@ class HealthResponse(BaseModel):
 
 def parse_ai_message(content: str) -> Dict[str, str]:
     """
-    Parses the content of an AI message to extract thought, observation, and code.
+    Parses the content of an AI message to extract thought, observation, code, and solution.
 
     Args:
         content: The raw string content from an AI message.
 
     Returns:
-        A dictionary with 'thought', 'observation', and 'code' keys.
+        A dictionary with 'thought', 'observation', 'code', and 'solution' keys.
     """
     parsed_data = {
         "thought": "",
         "observation": "",
-        "code": ""
+        "code": "",
+        "solution": ""
     }
-    
+
     # Use re.DOTALL to make '.' match newlines
     # Extract observation
     observation_match = re.search(r"<observation>(.*?)</observation>", content, re.DOTALL)
@@ -115,10 +116,16 @@ def parse_ai_message(content: str) -> Dict[str, str]:
     if execute_match:
         parsed_data["code"] = execute_match.group(1).strip()
         content = content.replace(execute_match.group(0), "") # Remove the tag to isolate thought
-    
+
+    # Extract solution
+    solution_match = re.search(r"<solution>(.*?)</solution>", content, re.DOTALL)
+    if solution_match:
+        parsed_data["solution"] = solution_match.group(1).strip()
+        content = content.replace(solution_match.group(0), "") # Remove the tag to isolate thought
+
     # The rest is thought
     parsed_data["thought"] = content.strip()
-    
+
     return parsed_data
 
 

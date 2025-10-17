@@ -10,9 +10,10 @@ interface MessageContentProps {
   thought?: string;
   observation?: string;
   code?: string;
+  solution?: string;
 }
 
-export function MessageContent({ thought, observation, code }: MessageContentProps) {
+export function MessageContent({ thought, observation, code, solution }: MessageContentProps) {
   return (
     <div className="space-y-3">
       {thought && (
@@ -52,6 +53,24 @@ export function MessageContent({ thought, observation, code }: MessageContentPro
               rehypePlugins={[rehypeHighlight]}
             >
               {`\`\`\`python\n${code}\n\`\`\``}
+            </ReactMarkdown>
+          </div>
+        </Card>
+      )}
+
+      {solution && (
+        <Card className={cn(
+          "p-4 border-l-4 border-l-purple-500 bg-purple-50/50 dark:bg-purple-950/20"
+        )}>
+          <div className="text-xs font-semibold text-purple-700 dark:text-purple-400 mb-2">
+            SOLUTION
+          </div>
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex, rehypeHighlight]}
+            >
+              {solution}
             </ReactMarkdown>
           </div>
         </Card>
