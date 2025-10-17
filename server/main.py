@@ -10,6 +10,7 @@ import re
 import json
 from contextlib import asynccontextmanager
 from typing import Optional, Dict
+from pathlib import Path  # <-- ADDED THIS IMPORT
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -19,6 +20,25 @@ from pydantic import BaseModel, Field
 
 from biomni.agent import A1
 from biomni.config import BiomniConfig, default_config
+
+# --- ADDED THIS BLOCK to dynamically define data path ---
+# Get the absolute path to this file (main.py)
+# e.g., /path/to/base/server/main.py
+THIS_FILE = Path(__file__).resolve()
+
+# Get the directory this file is in (server/)
+# e.g., /path/to/base/server
+SERVER_DIR = THIS_FILE.parent
+
+# Get the parent of the server/ directory (base/)
+# e.g., /path/to/base
+BASE_DIR = SERVER_DIR.parent
+
+# Define the data directory path
+# e.g., /path/to/base/data
+DATA_DIR = BASE_DIR / "data"
+# --- END OF ADDED BLOCK ---
+
 
 # Load environment variables
 if os.path.exists(".env"):
@@ -33,10 +53,21 @@ async def lifespan(app: FastAPI):
     """Initialize the agent on startup."""
     global agent
     print("Initializing Biomni agent...")
+
+    # --- MODIFIED THIS BLOCK to use dynamic path AND environment variable for LLM ---
+    data_path_str = str(DATA_DIR)
+    print(f"Using data path: {data_path_str}")
+
+    # Get default LLM from environment variable, default to 'gpt-4.1' if not set
+    default_llm = os.environ.get("BIOMNI_LLM", "gpt-4.1")
+    print(f"Initializing agent with default LLM: {default_llm}")
+
     # Initialize with default config on startup
-    default_config.path = '/Users/balaji/Biomni/data'
-    default_config.llm = 'gpt-4.1'
-    agent = A1(path="/Users/balaji/Biomni/data")
+    default_config.path = data_path_str
+    default_config.llm = default_llm  # <-- CHANGED to use variable
+    agent = A1(path=data_path_str)
+    # --- END OF MODIFIED BLOCK ---
+
     print("Biomni agent initialized successfully")
     yield
     # Cleanup if needed
