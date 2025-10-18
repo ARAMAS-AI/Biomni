@@ -86,21 +86,20 @@ export function StepItem({ type, content, stepNumber }: StepItemProps) {
             <span className={`text-sm font-semibold ${config.textColor}`}>
               {config.label}
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-400">
               Step {stepNumber}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content - ALL TEXT IS NOW WHITE */}
       <div className="relative">
         {type === 'code' ? (
           <div className="rounded-lg overflow-hidden bg-slate-950/50 border border-slate-800/50">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex, rehypeHighlight]}
-              // className="prose prose-invert prose-sm max-w-none p-4"
               components={{
                 code: ({ node, inline, className, children, ...props }: any) => {
                   if (inline) {
@@ -116,6 +115,96 @@ export function StepItem({ type, content, stepNumber }: StepItemProps) {
                     </code>
                   );
                 },
+                p: ({ children }) => (
+                  <p className="text-white leading-relaxed mb-3 last:mb-0">
+                    {children}
+                  </p>
+                ),
+                h1: ({ children }) => (
+                  <h1 className="text-white text-2xl font-bold mb-3">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-white text-xl font-bold mb-3">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-white text-lg font-bold mb-2">
+                    {children}
+                  </h3>
+                ),
+                h4: ({ children }) => (
+                  <h4 className="text-white text-base font-bold mb-2">
+                    {children}
+                  </h4>
+                ),
+                h5: ({ children }) => (
+                  <h5 className="text-white text-sm font-bold mb-2">
+                    {children}
+                  </h5>
+                ),
+                h6: ({ children }) => (
+                  <h6 className="text-white text-xs font-bold mb-2">
+                    {children}
+                  </h6>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside space-y-1 text-white my-3">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside space-y-1 text-white my-3">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-white leading-relaxed">
+                    {children}
+                  </li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="text-white font-bold">
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => (
+                  <em className="text-white italic">
+                    {children}
+                  </em>
+                ),
+                a: ({ children, href }) => (
+                  <a href={href} className="text-cyan-400 hover:text-cyan-300 underline">
+                    {children}
+                  </a>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-slate-600 pl-4 italic text-slate-300 my-3">
+                    {children}
+                  </blockquote>
+                ),
+                table: ({ children }) => (
+                  <table className="border-collapse border border-slate-600 w-full my-3 text-white">
+                    {children}
+                  </table>
+                ),
+                th: ({ children }) => (
+                  <th className="border border-slate-600 px-4 py-2 bg-slate-800 text-white font-bold">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="border border-slate-600 px-4 py-2 text-white">
+                    {children}
+                  </td>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-slate-950/50 rounded-lg p-4 overflow-x-auto border border-slate-800/50 my-3">
+                    {children}
+                  </pre>
+                ),
               }}
             >
               {`\`\`\`python\n${content}\n\`\`\``}
@@ -125,10 +214,9 @@ export function StepItem({ type, content, stepNumber }: StepItemProps) {
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex, rehypeHighlight]}
-            // className="prose prose-invert prose-sm max-w-none"
             components={{
               p: ({ children }) => (
-                <p className="text-slate-200 leading-relaxed mb-3 last:mb-0">
+                <p className="text-white leading-relaxed mb-3 last:mb-0">
                   {children}
                 </p>
               ),
@@ -151,20 +239,85 @@ export function StepItem({ type, content, stepNumber }: StepItemProps) {
                   {children}
                 </pre>
               ),
+              h1: ({ children }) => (
+                <h1 className="text-white text-2xl font-bold mb-3">
+                  {children}
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2 className="text-white text-xl font-bold mb-3">
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="text-white text-lg font-bold mb-2">
+                  {children}
+                </h3>
+              ),
+              h4: ({ children }) => (
+                <h4 className="text-white text-base font-bold mb-2">
+                  {children}
+                </h4>
+              ),
+              h5: ({ children }) => (
+                <h5 className="text-white text-sm font-bold mb-2">
+                  {children}
+                </h5>
+              ),
+              h6: ({ children }) => (
+                <h6 className="text-white text-xs font-bold mb-2">
+                  {children}
+                </h6>
+              ),
               ul: ({ children }) => (
-                <ul className="list-disc list-inside space-y-1 text-slate-200 my-3">
+                <ul className="list-disc list-inside space-y-1 text-white my-3">
                   {children}
                 </ul>
               ),
               ol: ({ children }) => (
-                <ol className="list-decimal list-inside space-y-1 text-slate-200 my-3">
+                <ol className="list-decimal list-inside space-y-1 text-white my-3">
                   {children}
                 </ol>
               ),
               li: ({ children }) => (
-                <li className="text-slate-200 leading-relaxed">
+                <li className="text-white leading-relaxed">
                   {children}
                 </li>
+              ),
+              strong: ({ children }) => (
+                <strong className="text-white font-bold">
+                  {children}
+                </strong>
+              ),
+              em: ({ children }) => (
+                <em className="text-white italic">
+                  {children}
+                </em>
+              ),
+              a: ({ children, href }) => (
+                <a href={href} className="text-cyan-400 hover:text-cyan-300 underline">
+                  {children}
+                </a>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-4 border-slate-600 pl-4 italic text-slate-300 my-3">
+                  {children}
+                </blockquote>
+              ),
+              table: ({ children }) => (
+                <table className="border-collapse border border-slate-600 w-full my-3 text-white">
+                  {children}
+                </table>
+              ),
+              th: ({ children }) => (
+                <th className="border border-slate-600 px-4 py-2 bg-slate-800 text-white font-bold">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="border border-slate-600 px-4 py-2 text-white">
+                  {children}
+                </td>
               ),
             }}
           >

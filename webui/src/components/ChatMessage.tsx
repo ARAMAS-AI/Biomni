@@ -1,7 +1,7 @@
 import { MessageContent } from './MessageContent';
 import { User, Bot } from 'lucide-react';
 
-interface Message {
+export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;

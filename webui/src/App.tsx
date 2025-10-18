@@ -120,13 +120,14 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header with Logo */}
+      {/* Header with Logo - BIGGER LOGO, NO ROUNDING */}
       <div className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/50 shadow-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-4">
           <img 
             src="/light.png" 
             alt="Logo" 
-            className="h-10 w-10 object-contain animate-fade-in"
+            className="h-16 w-16 object-contain animate-fade-in"
+            style={{ borderRadius: '0' }}
           />
           <div className="flex flex-col">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent animate-fade-in">
@@ -144,11 +145,14 @@ function App() {
         <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in-up">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center backdrop-blur-sm border border-blue-500/30">
+              {/* BIGGER LOGO ON MAIN SCREEN, NO ROUNDING */}
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center backdrop-blur-sm border border-blue-500/30"
+                   style={{ borderRadius: '9999px' }}>
                 <img 
                   src="/light.png" 
                   alt="Logo" 
-                  className="h-12 w-12 object-contain"
+                  className="h-20 w-20 object-contain"
+                  style={{ borderRadius: '0' }}
                 />
               </div>
               <div className="text-center space-y-2">

@@ -41,6 +41,7 @@ export function ChatInput({ onSend, isStreaming }: ChatInputProps) {
             transition-all duration-300
             placeholder:text-slate-500
             rounded-xl
+            text-white!
             shadow-lg
             group-hover:shadow-xl
             disabled:opacity-50
@@ -72,12 +73,12 @@ export function ChatInput({ onSend, isStreaming }: ChatInputProps) {
       >
         {isStreaming ? (
           <>
-            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            <Loader2 className="w-5 h-5 mr-2 animate-spin text-white!" />
             Thinking
           </>
         ) : (
           <>
-            <Send className="w-5 h-5 mr-2" />
+            <Send className="w-5 h-5 mr-2 text-white!" />
             Send
           </>
         )}

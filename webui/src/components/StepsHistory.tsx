@@ -12,7 +12,6 @@ interface StepsHistoryProps {
 }
 
 export function StepsHistory({ messages, currentMessage, error }: StepsHistoryProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,9 +20,17 @@ export function StepsHistory({ messages, currentMessage, error }: StepsHistoryPr
 
   // Filter out user messages, only show assistant steps
   const assistantMessages = messages.filter(m => m.role === 'assistant');
-  const allSteps = currentMessage
+  const allMessages = currentMessage
     ? [...assistantMessages, currentMessage]
     : assistantMessages;
+
+  // Flatten all steps from all assistant messages
+  const allSteps = allMessages.flatMap(message => 
+    (message.steps || []).map((step, idx) => ({
+      ...step,
+      globalIndex: idx
+    }))
+  );
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-slate-950">
@@ -42,7 +49,7 @@ export function StepsHistory({ messages, currentMessage, error }: StepsHistoryPr
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6">
+        <div className="p-6 space-y-4">
           {allSteps.length === 0 && !error && (
             <Card className="p-12 text-center border-dashed border-2">
               <div className="flex flex-col items-center gap-4 text-muted-foreground">
@@ -69,12 +76,12 @@ export function StepsHistory({ messages, currentMessage, error }: StepsHistoryPr
             </Card>
           )}
 
-          {allSteps.map((message, index) => (
+          {allSteps.map((step, index) => (
             <StepItem
-              key={index}
-              message={message}
+              key={step.id}
+              type={step.type}
+              content={step.content}
               stepNumber={index + 1}
-              isLatest={index === allSteps.length - 1 && !!currentMessage}
             />
           ))}
 

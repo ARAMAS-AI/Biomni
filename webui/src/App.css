@@ -1,8 +1,11 @@
 /* Additional app-specific styles */
 
-/* Markdown prose styles */
+/* Markdown prose styles - ALL WHITE TEXT */
 .prose {
-  color: hsl(var(--foreground));
+  color: white !important;
+}
+* {
+  color: white !important;
 }
 
 .prose h1,
@@ -11,7 +14,7 @@
 .prose h4,
 .prose h5,
 .prose h6 {
-  color: hsl(var(--foreground));
+  color: white !important;
   font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.5em;
@@ -20,6 +23,7 @@
 .prose p {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+  color: white !important;
 }
 
 .prose code {
@@ -27,6 +31,7 @@
   padding: 0.2em 0.4em;
   border-radius: 0.25rem;
   font-size: 0.875em;
+  color: rgb(103, 232, 249) !important; /* cyan-400 */
 }
 
 .prose pre {
@@ -41,10 +46,11 @@
   background-color: transparent;
   padding: 0;
   font-size: 0.875em;
+  color: white !important;
 }
 
 .prose a {
-  color: hsl(var(--primary));
+  color: rgb(103, 232, 249) !important; /* cyan-400 */
   text-decoration: underline;
 }
 
@@ -53,17 +59,29 @@
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   padding-left: 1.5em;
+  color: white !important;
 }
 
 .prose li {
   margin-top: 0.25em;
   margin-bottom: 0.25em;
+  color: white !important;
+}
+
+.prose strong {
+  color: white !important;
+  font-weight: bold;
+}
+
+.prose em {
+  color: white !important;
 }
 
 .prose table {
   width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
+  color: white !important;
 }
 
 .prose th,
@@ -71,11 +89,22 @@
   border: 1px solid hsl(var(--border));
   padding: 0.5em;
   text-align: left;
+  color: white !important;
 }
 
 .prose th {
   background-color: hsl(var(--muted));
   font-weight: 600;
+  color: white !important;
+}
+
+.prose blockquote {
+  color: rgb(203, 213, 225) !important; /* slate-300 */
+}
+
+/* Force all text elements to be white */
+.prose * {
+  color: white !important;
 }
 
 /* Scrollbar styles */
@@ -150,4 +179,14 @@ textarea {
     opacity: 0;
     max-height: 0;
   }
+}
+
+/* Ensure images are never rounded unless explicitly specified */
+img {
+  border-radius: 0 !important;
+}
+
+/* Only allow rounding on elements that explicitly need it */
+.rounded-full {
+  border-radius: 9999px !important;
 }
