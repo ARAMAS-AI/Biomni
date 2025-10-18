@@ -1,92 +1,186 @@
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { MessageContent } from './MessageContent';
-import { ChevronDown, ChevronRight, CheckCircle2, Circle, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { Message } from './ChatMessage';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/atom-one-dark.css';
+import 'katex/dist/katex.min.css';
+import { Brain, Code, Eye, Lightbulb } from 'lucide-react';
 
 interface StepItemProps {
-  message: Message;
+  type: 'thought' | 'observation' | 'code' | 'solution';
+  content: string;
   stepNumber: number;
-  isLatest?: boolean;
 }
 
-export function StepItem({ message, stepNumber, isLatest = false }: StepItemProps) {
-  const [isOpen, setIsOpen] = useState(isLatest);
-  const isComplete = !isLatest;
-  const isSolution = !!message.solution;
+const stepConfig = {
+  thought: {
+    icon: Brain,
+    label: 'Thinking',
+    gradient: 'from-purple-500/20 to-pink-500/20',
+    border: 'border-purple-500/30',
+    iconBg: 'from-purple-500 to-pink-500',
+    textColor: 'text-purple-300',
+  },
+  observation: {
+    icon: Eye,
+    label: 'Observation',
+    gradient: 'from-blue-500/20 to-cyan-500/20',
+    border: 'border-blue-500/30',
+    iconBg: 'from-blue-500 to-cyan-500',
+    textColor: 'text-blue-300',
+  },
+  code: {
+    icon: Code,
+    label: 'Code Execution',
+    gradient: 'from-green-500/20 to-emerald-500/20',
+    border: 'border-green-500/30',
+    iconBg: 'from-green-500 to-emerald-500',
+    textColor: 'text-green-300',
+  },
+  solution: {
+    icon: Lightbulb,
+    label: 'Solution',
+    gradient: 'from-amber-500/20 to-orange-500/20',
+    border: 'border-amber-500/30',
+    iconBg: 'from-amber-500 to-orange-500',
+    textColor: 'text-amber-300',
+  },
+};
 
-  // Generate a preview/summary for the step
-  const getStepSummary = () => {
-    if (message.solution) return 'Final Solution';
-    if (message.code) return 'Executing Code';
-    if (message.observation) return 'Analyzing Results';
-    if (message.thought) {
-      const firstLine = message.thought.split('\n')[0];
-      return firstLine.length > 60 ? firstLine.substring(0, 60) + '...' : firstLine;
-    }
-    return 'Processing...';
-  };
+export function StepItem({ type, content, stepNumber }: StepItemProps) {
+  const config = stepConfig[type];
+  const Icon = config.icon;
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card
-        className={cn(
-          "mb-3 overflow-hidden border transition-all duration-200",
-          isLatest && "border-l-4 border-l-blue-500 shadow-md",
-          isSolution && "border-l-4 border-l-purple-500 shadow-lg bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-950/20",
-          isOpen && "shadow-lg"
+    <div 
+      className={`
+        group relative rounded-xl 
+        bg-gradient-to-br ${config.gradient} 
+        backdrop-blur-sm border ${config.border}
+        p-5 transition-all duration-500 ease-out
+        hover:scale-[1.02] hover:shadow-2xl
+        hover:border-opacity-60
+      `}
+    >
+      {/* Glow effect on hover */}
+      <div className={`
+        absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 
+        transition-opacity duration-500
+        bg-gradient-to-br ${config.gradient}
+        blur-xl -z-10
+      `} />
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`
+          flex items-center justify-center w-10 h-10 rounded-lg
+          bg-gradient-to-br ${config.iconBg} 
+          shadow-lg transform transition-transform duration-300
+          group-hover:scale-110 group-hover:rotate-3
+        `}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-semibold ${config.textColor}`}>
+              {config.label}
+            </span>
+            <span className="text-xs text-slate-500">
+              Step {stepNumber}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative">
+        {type === 'code' ? (
+          <div className="rounded-lg overflow-hidden bg-slate-950/50 border border-slate-800/50">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex, rehypeHighlight]}
+              // className="prose prose-invert prose-sm max-w-none p-4"
+              components={{
+                code: ({ node, inline, className, children, ...props }: any) => {
+                  if (inline) {
+                    return (
+                      <code className="px-1.5 py-0.5 rounded bg-slate-800/50 text-cyan-400 text-xs font-mono" {...props}>
+                        {children}
+                      </code>
+                    );
+                  }
+                  return (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+              }}
+            >
+              {`\`\`\`python\n${content}\n\`\`\``}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex, rehypeHighlight]}
+            // className="prose prose-invert prose-sm max-w-none"
+            components={{
+              p: ({ children }) => (
+                <p className="text-slate-200 leading-relaxed mb-3 last:mb-0">
+                  {children}
+                </p>
+              ),
+              code: ({ node, inline, className, children, ...props }: any) => {
+                if (inline) {
+                  return (
+                    <code className="px-1.5 py-0.5 rounded bg-slate-800/50 text-cyan-400 text-xs font-mono" {...props}>
+                      {children}
+                    </code>
+                  );
+                }
+                return (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              pre: ({ children }) => (
+                <pre className="bg-slate-950/50 rounded-lg p-4 overflow-x-auto border border-slate-800/50 my-3">
+                  {children}
+                </pre>
+              ),
+              ul: ({ children }) => (
+                <ul className="list-disc list-inside space-y-1 text-slate-200 my-3">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal list-inside space-y-1 text-slate-200 my-3">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="text-slate-200 leading-relaxed">
+                  {children}
+                </li>
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
         )}
-      >
-        <CollapsibleTrigger className="w-full p-4 hover:bg-accent/50 transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0">
-              {isOpen ? (
-                <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform" />
-              ) : (
-                <ChevronRight className="w-5 h-5 text-muted-foreground transition-transform" />
-              )}
-            </div>
+      </div>
 
-            <div className="flex-shrink-0">
-              {isSolution ? (
-                <Sparkles className="w-5 h-5 text-purple-500" />
-              ) : isComplete ? (
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-              ) : (
-                <Circle className="w-5 h-5 text-blue-500 animate-pulse" />
-              )}
-            </div>
-
-            <div className="flex-1 text-left">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-foreground">
-                  Step {stepNumber}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {getStepSummary()}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex-shrink-0 text-xs text-muted-foreground">
-              {message.timestamp.toLocaleTimeString()}
-            </div>
-          </div>
-        </CollapsibleTrigger>
-
-        <CollapsibleContent>
-          <div className="px-4 pb-4 pt-2 border-t">
-            <MessageContent
-              thought={message.thought}
-              observation={message.observation}
-              code={message.code}
-              solution={message.solution}
-            />
-          </div>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+      {/* Bottom accent line */}
+      <div className={`
+        absolute bottom-0 left-0 right-0 h-0.5 
+        bg-gradient-to-r ${config.iconBg}
+        transform scale-x-0 group-hover:scale-x-100
+        transition-transform duration-500 ease-out
+        rounded-b-xl
+      `} />
+    </div>
   );
 }

@@ -93,18 +93,30 @@ export function useAgentStream(
                   break;
                 }
 
-                // Regular message update
-                const message: StreamMessage = {
-                  thought: parsed.thought || undefined,
-                  observation: parsed.observation || undefined,
-                  code: parsed.code || undefined,
-                  solution: parsed.solution || undefined,
-                };
+                // Send each field as a separate message for individual step rendering
+                // This ensures each observation and code block appears as its own step
+                if (parsed.thought) {
+                  const thoughtMessage: StreamMessage = { thought: parsed.thought };
+                  setCurrentMessage(thoughtMessage);
+                  onMessage(thoughtMessage);
+                }
 
-                // Only process if there's actual content
-                if (message.thought || message.observation || message.code || message.solution) {
-                  setCurrentMessage(message);
-                  onMessage(message);
+                if (parsed.observation) {
+                  const observationMessage: StreamMessage = { observation: parsed.observation };
+                  setCurrentMessage(observationMessage);
+                  onMessage(observationMessage);
+                }
+
+                if (parsed.code) {
+                  const codeMessage: StreamMessage = { code: parsed.code };
+                  setCurrentMessage(codeMessage);
+                  onMessage(codeMessage);
+                }
+
+                if (parsed.solution) {
+                  const solutionMessage: StreamMessage = { solution: parsed.solution };
+                  setCurrentMessage(solutionMessage);
+                  onMessage(solutionMessage);
                 }
               } catch (e) {
                 console.error('Failed to parse SSE data:', e, data);
