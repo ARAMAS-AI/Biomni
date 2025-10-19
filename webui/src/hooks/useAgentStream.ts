@@ -38,7 +38,7 @@ export function useAgentStream(
       setCurrentMessage(null);
 
       try {
-        const response = await fetch('http://localhost:8000/agent/stream', {
+        const response = await fetch('http://172.206.115.104:8000/agent/stream', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
