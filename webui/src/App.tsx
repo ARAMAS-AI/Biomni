@@ -20,7 +20,6 @@ interface Message {
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [stepCounter, setStepCounter] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -39,7 +38,6 @@ function App() {
       if (lastMessage && lastMessage.role === 'assistant') {
         const steps = lastMessage.steps || [];
         
-        // Add each field as a separate step with timestamp
         if (streamMessage.thought) {
           const thoughtStep = {
             id: `step-${stepCounter}`,
@@ -85,6 +83,10 @@ function App() {
         }
 
         lastMessage.steps = steps;
+
+        if (streamMessage.solution) {
+          lastMessage.content = streamMessage.solution;
+        }
       }
 
       return newMessages;
@@ -92,10 +94,10 @@ function App() {
   };
 
   const handleStreamComplete = () => {
-    console.log('Stream complete');
+    console.log('Stream completed');
   };
 
-  const { sendQuery, isStreaming } = useAgentStream(
+  const { sendQuery, isStreaming, error } = useAgentStream(
     handleStreamMessage,
     handleStreamComplete
   );
@@ -119,71 +121,71 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header with Logo - BIGGER LOGO, NO ROUNDING */}
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/50 shadow-xl">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-4">
-          <img 
-            src="/light.png" 
-            alt="Logo" 
-            className="h-16 w-16 object-contain animate-fade-in"
-            style={{ borderRadius: '0' }}
-          />
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent animate-fade-in">
-              BiOmni Agent
-            </h1>
-            <p className="text-xs text-slate-400 animate-fade-in-delay">
-              Biomedical Research Assistant
-            </p>
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Left Column - Query Input */}
+      <div className="w-[400px] border-r border-slate-200 bg-white flex flex-col shadow-sm">
+        <div className="p-6 border-b border-slate-200">
+          <h1 className="text-2xl font-semibold text-slate-900 mb-1">AI Agent</h1>
+          <p className="text-sm text-slate-500">Enter your query to get started</p>
+        </div>
+        
+        <ScrollArea className="flex-1 p-6">
+          <div className="space-y-4">
+            {messages
+              .filter((msg) => msg.role === 'user')
+              .map((msg, idx) => (
+                <div key={msg.id} className="group">
+                  <div className="text-xs font-medium text-slate-400 mb-2 flex items-center gap-2">
+                    <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                      Query {idx + 1}
+                    </span>
+                    <span className="text-slate-300">•</span>
+                    <span>{new Date(parseInt(msg.id)).toLocaleTimeString()}</span>
+                  </div>
+                  <div className="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-lg p-4 shadow-sm">
+                    <p className="text-slate-800 text-sm leading-relaxed">{msg.content}</p>
+                  </div>
+                </div>
+              ))}
           </div>
+        </ScrollArea>
+
+        <div className="p-6 border-t border-slate-200 bg-slate-50">
+          <ChatInput onSend={handleSendMessage} disabled={isStreaming} />
+          {error && (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-xs text-red-600">{error}</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Chat Messages */}
-      <ScrollArea className="flex-1" ref={scrollRef}>
-        <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full space-y-6 animate-fade-in-up">
-              {/* BIGGER LOGO ON MAIN SCREEN, NO ROUNDING */}
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center backdrop-blur-sm border border-blue-500/30"
-                   style={{ borderRadius: '9999px' }}>
-                <img 
-                  src="/light.png" 
-                  alt="Logo" 
-                  className="h-20 w-20 object-contain"
-                  style={{ borderRadius: '0' }}
-                />
-              </div>
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-semibold text-slate-200">
-                  Welcome to BiOmni
-                </h2>
-                <p className="text-slate-400 max-w-md">
-                  Ask me anything about biomedical research, data analysis, or scientific computing.
-                </p>
-              </div>
-            </div>
-          )}
-          
-          {messages.map((message, index) => (
-            <div 
-              key={message.id}
-              className="animate-fade-in-up"
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <ChatMessage message={message} />
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
+      {/* Right Column - Agent Response */}
+      <div className="flex-1 flex flex-col">
+        <div className="p-6 border-b border-slate-200 bg-white shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900 mb-1">Agent Response</h2>
+          <p className="text-sm text-slate-500">
+            {isStreaming ? (
+              <span className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Processing your query...
+              </span>
+            ) : (
+              'Waiting for query'
+            )}
+          </p>
         </div>
-      </ScrollArea>
 
-      {/* Input Area */}
-      <div className="sticky bottom-0 backdrop-blur-xl bg-slate-950/80 border-t border-slate-800/50 shadow-2xl">
-        <div className="max-w-5xl mx-auto px-6 py-4">
-          <ChatInput onSend={handleSendMessage} isStreaming={isStreaming} />
-        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            {messages
+              .filter((msg) => msg.role === 'assistant')
+              .map((msg) => (
+                <ChatMessage key={msg.id} message={msg} />
+              ))}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );

@@ -1,93 +1,34 @@
-import { useEffect, useRef } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { StepItem } from './StepItem';
-import { Card } from '@/components/ui/card';
-import { AlertCircle, Sparkles, Activity } from 'lucide-react';
-import type { Message } from './ChatMessage';
 
-interface StepsHistoryProps {
-  messages: Message[];
-  currentMessage: Message | null;
-  error: string | null;
+interface Step {
+  id: string;
+  type: 'thought' | 'observation' | 'code' | 'solution';
+  content: string;
+  timestamp: number;
 }
 
-export function StepsHistory({ messages, currentMessage, error }: StepsHistoryProps) {
-  const endRef = useRef<HTMLDivElement>(null);
+interface StepsHistoryProps {
+  steps: Step[];
+}
 
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, currentMessage]);
-
-  // Filter out user messages, only show assistant steps
-  const assistantMessages = messages.filter(m => m.role === 'assistant');
-  const allMessages = currentMessage
-    ? [...assistantMessages, currentMessage]
-    : assistantMessages;
-
-  // Flatten all steps from all assistant messages
-  const allSteps = allMessages.flatMap(message => 
-    (message.steps || []).map((step, idx) => ({
-      ...step,
-      globalIndex: idx
-    }))
-  );
+export function StepsHistory({ steps }: StepsHistoryProps) {
+  const groupedSteps = steps.reduce((acc, step) => {
+    if (!acc[step.type]) {
+      acc[step.type] = [];
+    }
+    acc[step.type].push(step);
+    return acc;
+  }, {} as Record<string, Step[]>);
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-slate-950">
-      <div className="p-6 border-b bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="flex items-center gap-3">
-          <Activity className="w-6 h-6 text-blue-600" />
-          <div>
-            <h2 className="text-xl font-bold text-foreground">Execution Steps</h2>
-            <p className="text-sm text-muted-foreground">
-              {allSteps.length > 0
-                ? `${allSteps.length} step${allSteps.length !== 1 ? 's' : ''} completed`
-                : 'Waiting for query...'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <ScrollArea className="flex-1">
-        <div className="p-6 space-y-4">
-          {allSteps.length === 0 && !error && (
-            <Card className="p-12 text-center border-dashed border-2">
-              <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                <Sparkles className="w-12 h-12 opacity-50" />
-                <div>
-                  <p className="text-lg font-semibold mb-1">Ready to Process</p>
-                  <p className="text-sm">
-                    Enter a query in the left panel to see the agent's thinking process
-                  </p>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {error && (
-            <Card className="p-4 border-destructive bg-destructive/10 mb-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-destructive">Error</p>
-                  <p className="text-sm text-destructive/90 mt-1">{error}</p>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {allSteps.map((step, index) => (
-            <StepItem
-              key={step.id}
-              type={step.type}
-              content={step.content}
-              stepNumber={index + 1}
-            />
+    <div className="space-y-3">
+      {Object.entries(groupedSteps).map(([type, typeSteps]) => (
+        <div key={type}>
+          {typeSteps.map((step) => (
+            <StepItem key={step.id} step={step} />
           ))}
-
-          <div ref={endRef} />
         </div>
-      </ScrollArea>
+      ))}
     </div>
   );
 }

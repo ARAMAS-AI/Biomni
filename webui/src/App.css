@@ -1,11 +1,13 @@
-/* Additional app-specific styles */
-
-/* Markdown prose styles - ALL WHITE TEXT */
-.prose {
-  color: white !important;
-}
+/* Light mode professional styling */
 * {
-  color: white !important;
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Markdown prose styles - DARK TEXT FOR LIGHT MODE */
+.prose {
+  color: #1e293b !important;
 }
 
 .prose h1,
@@ -14,7 +16,7 @@
 .prose h4,
 .prose h5,
 .prose h6 {
-  color: white !important;
+  color: #0f172a !important;
   font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.5em;
@@ -23,35 +25,46 @@
 .prose p {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
-  color: white !important;
+  color: #334155 !important;
+  line-height: 1.6;
 }
 
 .prose code {
-  background-color: hsl(var(--muted));
+  background-color: #f1f5f9;
+  color: #7c3aed !important;
   padding: 0.2em 0.4em;
   border-radius: 0.25rem;
   font-size: 0.875em;
-  color: rgb(103, 232, 249) !important; /* cyan-400 */
+  border: 1px solid #e2e8f0;
 }
 
 .prose pre {
-  background-color: hsl(var(--muted));
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   padding: 1em;
   border-radius: 0.5rem;
   overflow-x: auto;
   margin: 1em 0;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .prose pre code {
   background-color: transparent;
   padding: 0;
   font-size: 0.875em;
-  color: white !important;
+  color: #1e293b !important;
+  border: none;
 }
 
 .prose a {
-  color: rgb(103, 232, 249) !important; /* cyan-400 */
+  color: #7c3aed !important;
   text-decoration: underline;
+  text-decoration-color: #c4b5fd;
+}
+
+.prose a:hover {
+  color: #6d28d9 !important;
+  text-decoration-color: #a78bfa;
 }
 
 .prose ul,
@@ -59,95 +72,73 @@
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   padding-left: 1.5em;
-  color: white !important;
+  color: #334155 !important;
 }
 
 .prose li {
   margin-top: 0.25em;
   margin-bottom: 0.25em;
-  color: white !important;
+  color: #334155 !important;
 }
 
 .prose strong {
-  color: white !important;
-  font-weight: bold;
+  color: #0f172a !important;
+  font-weight: 600;
 }
 
 .prose em {
-  color: white !important;
+  color: #475569 !important;
 }
 
 .prose table {
   width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
-  color: white !important;
+  color: #334155 !important;
 }
 
 .prose th,
 .prose td {
-  border: 1px solid hsl(var(--border));
+  border: 1px solid #e2e8f0;
   padding: 0.5em;
   text-align: left;
-  color: white !important;
+  color: #334155 !important;
 }
 
 .prose th {
-  background-color: hsl(var(--muted));
+  background-color: #f8fafc;
   font-weight: 600;
-  color: white !important;
+  color: #0f172a !important;
 }
 
 .prose blockquote {
-  color: rgb(203, 213, 225) !important; /* slate-300 */
+  color: #64748b !important;
+  border-left: 3px solid #c4b5fd;
+  padding-left: 1em;
+  margin-left: 0;
 }
 
-/* Force all text elements to be white */
-.prose * {
-  color: white !important;
-}
-
-/* Scrollbar styles */
+/* Scrollbar styles - Light mode */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.3);
+  background: #f1f5f9;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: #cbd5e1;
   border-radius: 8px;
-  border: 2px solid transparent;
+  border: 2px solid #f1f5f9;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.8);
+  background: #94a3b8;
   background-clip: padding-box;
-}
-
-/* Smooth transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-/* Disable transitions for certain elements */
-button,
-input,
-textarea {
-  transition-property: background-color, border-color, color, box-shadow;
-}
-
-/* Code block enhancements */
-.prose pre {
-  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted) / 0.8) 100%);
-  box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 /* Collapsible animations */
@@ -181,12 +172,24 @@ textarea {
   }
 }
 
-/* Ensure images are never rounded unless explicitly specified */
-img {
-  border-radius: 0 !important;
+/* Pulse animation for loading states */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-/* Only allow rounding on elements that explicitly need it */
-.rounded-full {
-  border-radius: 9999px !important;
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Focus styles */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
 }
