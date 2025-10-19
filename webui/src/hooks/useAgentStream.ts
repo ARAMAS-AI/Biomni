@@ -43,7 +43,7 @@ export function useAgentStream(
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ query, llm }),
+          body: JSON.stringify({ query, llm, test: 'a' }),
           signal: abortControllerRef.current.signal,
         });
 
