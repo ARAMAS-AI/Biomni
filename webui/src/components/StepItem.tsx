@@ -60,7 +60,7 @@ export function StepItem({ step }: StepItemProps) {
   const config = stepConfig[step.type];
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="animate-fadeInUp">
       <Card className={`${config.bgColor} border ${config.borderColor} shadow-sm hover:shadow-md transition-all`}>
         <CollapsibleTrigger className="w-full p-4 text-left">
           <div className="flex items-center justify-between">

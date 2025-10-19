@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChatMessage } from './components/ChatMessage';
-import { ChatInput } from './components/ChatInput';
-import { ScrollArea } from './components/ui/scroll-area';
-import { useAgentStream } from './hooks/useAgentStream';
-import type { StreamMessage } from './hooks/useAgentStream';
+import { ChatMessage } from '@/components/ChatMessage';
+import { ChatInput } from '@/components/ChatInput';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAgentStream } from '@/hooks/useAgentStream';
+import type { StreamMessage } from '@/hooks/useAgentStream';
 
 interface Message {
   id: string;
@@ -120,13 +120,20 @@ function App() {
     sendQuery(content);
   };
 
+  const hasAssistantOutput = messages.some(
+    (msg) => msg.role === 'assistant' && ((msg.steps && msg.steps.length > 0) || msg.content)
+  );
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Left Column - Query Input */}
       <div className="w-[400px] border-r border-slate-200 bg-white flex flex-col shadow-sm">
-        <div className="p-6 border-b border-slate-200">
-          <h1 className="text-2xl font-semibold text-slate-900 mb-1">AI Agent</h1>
-          <p className="text-sm text-slate-500">Enter your query to get started</p>
+        <div className="p-4 border-b border-slate-200 flex items-center gap-4">
+          <img src="/light.png" alt="Logo" className="w-10 h-10 rounded-md" />
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900 mb-0">Aramas AI</h1>
+            <p className="text-sm text-slate-500">Enter your query to get started</p>
+          </div>
         </div>
         
         <ScrollArea className="flex-1 p-6">
@@ -134,7 +141,7 @@ function App() {
             {messages
               .filter((msg) => msg.role === 'user')
               .map((msg, idx) => (
-                <div key={msg.id} className="group">
+                <div key={msg.id} className="group animate-fadeInUp">
                   <div className="text-xs font-medium text-slate-400 mb-2 flex items-center gap-2">
                     <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
                       Query {idx + 1}
@@ -164,27 +171,43 @@ function App() {
       <div className="flex-1 flex flex-col">
         <div className="p-6 border-b border-slate-200 bg-white shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900 mb-1">Agent Response</h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 h-5">
             {isStreaming ? (
               <span className="flex items-center gap-2">
-                <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span className="thinking-dots flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="inline-block w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="inline-block w-2 h-2 bg-violet-500 rounded-full"></span>
+                </span>
                 Processing your query...
               </span>
             ) : (
-              'Waiting for query'
+              hasAssistantOutput ? 'Response complete' : 'Waiting for query'
             )}
           </p>
         </div>
 
         <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            {messages
-              .filter((msg) => msg.role === 'assistant')
-              .map((msg) => (
-                <ChatMessage key={msg.id} message={msg} />
-              ))}
-            <div ref={messagesEndRef} />
-          </div>
+          {hasAssistantOutput ? (
+            <div className="p-6 space-y-6">
+              {messages
+                .filter((msg) => msg.role === 'assistant')
+                .map((msg) => (
+                  <ChatMessage key={msg.id} message={msg} />
+                ))}
+              <div ref={messagesEndRef} />
+            </div>
+          ) : (
+            !isStreaming && (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 animate-fadeInUp">
+                <img src="/light.png" alt="Logo" className="w-24 h-24 mb-6 opacity-40 rounded-lg" />
+                <h2 className="text-xl font-semibold text-slate-600">Aramas AI</h2>
+                <p className="text-slate-500 mt-2 max-w-sm">
+                  Your intelligent agent is ready. Start by entering a query on the left to see the magic happen.
+                </p>
+              </div>
+            )
+          )}
         </ScrollArea>
       </div>
     </div>
@@ -192,3 +215,4 @@ function App() {
 }
 
 export default App;
+

@@ -12,22 +12,11 @@ interface StepsHistoryProps {
 }
 
 export function StepsHistory({ steps }: StepsHistoryProps) {
-  const groupedSteps = steps.reduce((acc, step) => {
-    if (!acc[step.type]) {
-      acc[step.type] = [];
-    }
-    acc[step.type].push(step);
-    return acc;
-  }, {} as Record<string, Step[]>);
-
   return (
+    // Steps are rendered chronologically to show the agent's process.
     <div className="space-y-3">
-      {Object.entries(groupedSteps).map(([type, typeSteps]) => (
-        <div key={type}>
-          {typeSteps.map((step) => (
-            <StepItem key={step.id} step={step} />
-          ))}
-        </div>
+      {steps.map((step) => (
+        <StepItem key={step.id} step={step} />
       ))}
     </div>
   );
