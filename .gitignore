@@ -63,7 +63,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+biomni/lib/
+biomni_env/lib/
 lib64/
 parts/
 sdist/
