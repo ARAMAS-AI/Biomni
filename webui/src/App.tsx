@@ -124,18 +124,18 @@ function App() {
       <div className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/50 shadow-xl">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-4">
           <img 
-            src="/light.png" 
+            src="/light.jpg" 
             alt="Logo" 
             className="h-16 w-16 object-contain animate-fade-in"
             style={{ borderRadius: '0' }}
           />
           <div className="flex flex-col">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent animate-fade-in">
-              BiOmni Agent
+              Biomedical Research Agent
             </h1>
-            <p className="text-xs text-slate-400 animate-fade-in-delay">
+            {/* <p className="text-xs text-slate-400 animate-fade-in-delay">
               Biomedical Research Assistant
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -149,7 +149,7 @@ function App() {
               <div className="w-32 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center backdrop-blur-sm border border-blue-500/30"
                    style={{ borderRadius: '9999px' }}>
                 <img 
-                  src="/light.png" 
+                  src="/light.jpg" 
                   alt="Logo" 
                   className="h-20 w-20 object-contain"
                   style={{ borderRadius: '0' }}
@@ -157,7 +157,7 @@ function App() {
               </div>
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-semibold text-slate-200">
-                  Welcome to BiOmni
+                  Welcome to the Biomedical Research Agent
                 </h2>
                 <p className="text-slate-400 max-w-md">
                   Ask me anything about biomedical research, data analysis, or scientific computing.

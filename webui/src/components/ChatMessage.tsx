@@ -42,7 +42,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div className={`flex-1 space-y-2 ${isUser ? 'items-end' : 'items-start'}`}>
         {/* Role Label */}
         <div className={`text-xs font-medium ${isUser ? 'text-right text-blue-400' : 'text-left text-purple-400'}`}>
-          {isUser ? 'You' : 'BiOmni Agent'}
+          {isUser ? 'You' : 'Biomedical Research Agent'}
         </div>
 
         {/* Message Bubble or Steps */}
