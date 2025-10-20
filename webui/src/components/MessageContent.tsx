@@ -1,37 +1,39 @@
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { StepItem } from './StepItem';
 
-interface MessageContentProps {
+interface Step {
+  id: string;
+  type: 'thought' | 'observation' | 'code' | 'solution';
   content: string;
+  timestamp: number;
 }
 
-export function MessageContent({ content }: MessageContentProps) {
+interface MessageContentProps {
+  steps: Step[];
+}
+
+export function MessageContent({ steps }: MessageContentProps) {
+  if (!steps || steps.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="prose prose-sm max-w-none">
-      <ReactMarkdown
-        components={{
-          code({ node, inline, className, children, ...props }: any) {
-            const match = /language-(\w+)/.exec(className || '');
-            return !inline && match ? (
-              <SyntaxHighlighter
-                style={oneLight}
-                language={match[1]}
-                PreTag="div"
-                {...props}
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
-            ) : (
-              <code className={className} {...props}>
-                {children}
-              </code>
-            );
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+    <div className="space-y-4">
+      {steps.map((step, index) => (
+        <div
+          key={step.id}
+          className="animate-slide-in-up"
+          style={{ 
+            animationDelay: `${index * 0.15}s`,
+            animationFillMode: 'both'
+          }}
+        >
+          <StepItem
+            type={step.type}
+            content={step.content}
+            stepNumber={index + 1}
+          />
+        </div>
+      ))}
     </div>
   );
 }
